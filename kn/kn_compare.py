@@ -1,13 +1,15 @@
 import json
+from kn.config import KnConfig
 if __name__=="__main__":
     import kn_scrapper
-DB_FILE_OLD = r"C:\_projects\test-prj\db-A03-2021-10-11-01_00_01.json"
-DB_FILE_OLD = r"C:\_projects\test-prj\db-A03-2021-10-16-16_25_57.json"
-DB_FILE_NEW = r"C:\_projects\test-prj\db-A03-2021-10-17-18_45_56.json"
+DB_FILE_OLD = r"C:\_projects\kn_monitoring\data\db-A03-2021-10-11-01_00_01.json"
+DB_FILE_OLD = r"C:\_projects\kn_monitoring\data\db-A03-2021-10-31-01_15_48.json"
+DB_FILE_NEW = r"C:\_projects\kn_monitoring\data\db-A03-2021-10-31-13_21_56.json"
 
+cfg = KnConfig()
 
 class KnTransfers:
-    def __init__(self, old_db=DB_FILE_OLD, new_db=DB_FILE_NEW) -> None:
+    def __init__(self, old_db=cfg.db_compare_base, new_db=DB_FILE_NEW) -> None:
         self.old_db = old_db
         self.new_db = new_db
 
@@ -82,7 +84,7 @@ class KnTransfers:
         print('____________________')
         
         print('########## New statistics ##########')
-        scrapper_class.statistics(new)
+        scrapper_class.statistics(new, show=True)
         print('____________________') 
 
 
