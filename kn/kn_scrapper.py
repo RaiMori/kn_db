@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 from typing import Tuple
 from selenium import webdriver
+from selenium.webdriver.chrome import options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
+from selenium.webdriver.chrome.options import Options 
 import unittest, time, re
 import json
 from datetime import date, datetime
+from kn.config import KnConfig
+DATA_PATH = 'C:/_projects/kn_monitoring/data'
+cfg = KnConfig()
 if __name__=='__main__':
     import kn_compare
 
@@ -61,8 +66,10 @@ class UntitledTestCase(unittest.TestCase):
 
 
 class KNScrapper:
-    def __init__(self, block='A03', min_room_num=1, max_room_num=40, min_floor=2, max_floor=9) -> None:
-        
+    def __init__(self, block='A03', min_room_num=1, max_room_num=40, min_floor=2, max_floor=9, headless=False) -> None:
+        self.chrome_options = Options()
+        if headless:
+            self.chrome_options.add_argument('--headless')
         #driver.implicitly_wait(30)
         base_url = "https://kn.vutbr.cz/"
         self.min_room = min_room_num
@@ -102,7 +109,7 @@ class KNScrapper:
 
     def scrap(self):
         db = []
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Chrome(options=self.chrome_options)
         driver = self.driver
         driver.get("https://kn.vutbr.cz/is2/")
         driver.find_element_by_name("AUTH_LOGIN").click()
@@ -137,6 +144,9 @@ class KNScrapper:
             room = {r: [p1, p2]}
 
             db.append(room)
+        driver.close()
+        with open(cfg.data_path + 'latest.json', 'w+') as f:
+            f.write(json.dumps(db))
         return db
 
     @staticmethod
@@ -167,6 +177,7 @@ class KNScrapper:
             print("Empty rooms: ", len(empty))
             if show_empty_rooms:
                 print("Empty rooms: ", "\n".join(empty))
+            return empty
 
             
 
@@ -180,7 +191,7 @@ if __name__ == "__main__":
     t = str(datetime.now()).replace(' ', '-').replace('.', "-")
     t = datetime.now().strftime('%Y-%m-%d-%H_%M_%S')
     file_content = json.dumps(db, indent=4)
-    filename = f'C:/_projects/test-prj/db-{a.block}-{t}.json'
+    filename = f'{cfg.data_path}/db-{a.block}-{t}.json'
     with open(filename, 'w+') as f:
         f.write(file_content)
 
@@ -192,4 +203,4 @@ if __name__ == "__main__":
     transfers.compare(scrapper_class=KNScrapper)
         
     #print(db)
-    a.driver.stop_client()
+    #a.driver.close
