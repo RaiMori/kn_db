@@ -1,3 +1,9 @@
 venv/**
 __pychache__/
 *.json 
+__pycache__/
+kn/__pycache__/
+kn/db_mngmnt.py
+kn/templates/
+loto.py
+utils/
